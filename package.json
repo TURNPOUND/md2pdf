@@ -1,0 +1,33 @@
+{
+  "name": "md2pdf-print",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "把 Markdown 转成适合打印的 PDF：黑白省墨、中文友好、页码目录齐全",
+  "bin": {
+    "md2pdf": "./src/cli.mjs"
+  },
+  "scripts": {
+    "start": "node src/cli.mjs",
+    "gui": "node src/server.mjs --open",
+    "test": "node test/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@vscode/markdown-it-katex": "^1.1.2",
+    "highlight.js": "^11.12.0",
+    "js-yaml": "^5.5.0",
+    "katex": "^0.19.1",
+    "markdown-it": "^15.0.3",
+    "markdown-it-anchor": "^10.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "puppeteer-core": "^25.16.0"
+  },
+  "notes": {
+    "mermaid": "Mermaid 运行时以静态文件形式放在 assets/mermaid.min.js（约 5MB），不通过 npm 安装。若要升级，替换该文件即可。",
+    "browser": "本工具不下载浏览器，直接调用系统已安装的 Edge 或 Chrome。也可用环境变量 MD2PDF_BROWSER 指定。"
+  }
+}

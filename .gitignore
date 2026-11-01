@@ -1,0 +1,20 @@
+# 运行时依赖（clone 后执行 npm install 重新生成）
+node_modules/
+
+# 转换产物与测试输出
+test/out/
+test/dl/
+dist/
+.cache/
+
+# 日志与临时文件
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
