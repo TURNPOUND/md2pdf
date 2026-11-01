@@ -285,9 +285,69 @@ function openUrl(u) {
   }
 }
 
+/** 探测某个端口上是否已经跑着我们自己的服务 */
+function probeRunning(port) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = (v) => {
+      if (!settled) {
+        settled = true;
+        resolve(v);
+      }
+    };
+    const req = http.get(`http://127.0.0.1:${port}/api/info`, { timeout: 700 }, (res) => {
+      if (res.statusCode !== 200) {
+        res.resume();
+        return done(null);
+      }
+      let data = '';
+      res.setEncoding('utf8');
+      res.on('data', (c) => (data += c));
+      res.on('end', () => {
+        try {
+          const j = JSON.parse(data);
+          done(j && j.version ? j : null);
+        } catch {
+          done(null);
+        }
+      });
+    });
+    req.on('error', () => done(null));
+    req.on('timeout', () => {
+      req.destroy();
+      done(null);
+    });
+  });
+}
+
+/** 在默认端口附近找已经在跑的实例 */
+async function findRunningInstance(base = 7361, span = 6) {
+  for (let p = base; p < base + span; p++) {
+    const info = await probeRunning(p);
+    if (info) return { port: p, info };
+  }
+  return null;
+}
+
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
-  startServer({ open: process.argv.includes('--open') }).catch((err) => {
+  const wantOpen = process.argv.includes('--open');
+  const forceNew = process.argv.includes('--new');
+  (async () => {
+    // 已经开着一个就别再开一个，直接打开浏览器完事
+    if (!forceNew) {
+      const running = await findRunningInstance();
+      if (running && running.info.version === PKG.version) {
+        const url = `http://127.0.0.1:${running.port}`;
+        const started = new Date(running.info.startedAt).toLocaleString('zh-CN', { hour12: false });
+        console.log(`\n  服务已经在运行：${url}`);
+        console.log(`  启动于 ${started}（要重启请先关掉那个窗口，或加 --new 强制新开）\n`);
+        if (wantOpen) openUrl(url);
+        process.exit(0);
+      }
+    }
+    await startServer({ open: true });
+  })().catch((err) => {
     console.error(err);
     process.exit(1);
   });
