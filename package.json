@@ -3,7 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "license": "MIT",
   "description": "把 Markdown 转成适合打印的 PDF：黑白省墨、中文友好、页码目录齐全",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TURNPOUND/md2pdf.git"
+  },
   "bin": {
     "md2pdf": "./src/cli.mjs"
   },
